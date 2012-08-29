@@ -1,4 +1,5 @@
-﻿#include <algorithm>
+﻿#include <cctype>
+#include <algorithm>
 #include "directoryman.h"
 #include "stringutil.h"
 #include "trace.h"
@@ -30,6 +31,27 @@ void	CDirectoryManager::ResetParam()
 	m_selectedpos = 0;
 	m_displaytop = 0;
 	m_displaylines = 0;
+}
+
+std::wstring splitfilename(const wchar_t* path) 
+{ 
+	wchar t[_MAX_FNAME]; 
+	_wsplitpath_s(path, NULL, 0, NULL, 0, t, _MAX_FNAME, NULL, 0); 
+	return std::wstring(t); 
+}
+
+std::wstring splitfileext(const wchar* path) 
+{ 
+	wchar t[_MAX_EXT]; 
+	_wsplitpath_s(path, NULL, 0, NULL, 0, NULL, 0, t, _MAX_EXT); 
+	return std::wstring(t); 
+}
+
+std::wstring splitfilepath(const wchar_t* path) 
+{ 
+	wchar t[_MAX_DRIVE], d[_MAX_DIR], f[_MAX_FNAME]; 
+	_wsplitpath_s(path, t, _MAX_DRIVE, d, _MAX_DIR, f, _MAX_FNAME, NULL, 0); 
+	return std::wstring(t) + std::wstring(d) + std::wstring(f); 
 }
 
 void	CDirectoryManager::AnalizeDirectory(const wchar *path)
@@ -75,6 +97,8 @@ void	CDirectoryManager::AnalizeDirectory(const wchar *path)
 			info.m_type = TYPE_DIRECTORY;
 			info.m_name = wfd.cFileName;
 
+			transform(info.m_name.begin(), info.m_name.end(), info.m_name.begin(), toupper);
+
 			int len = unicode::strlen(path);
 			if(path[len-1] == '\\')
 			info.m_fullpath = String(path) + info.m_name;
@@ -90,8 +114,12 @@ void	CDirectoryManager::AnalizeDirectory(const wchar *path)
 		{
 			FILEINFO info;
 			info.m_type = TYPE_FILE;
-			info.m_name = wfd.cFileName;
+			info.m_name = splitfilename(wfd.cFileName);
+			info.m_ext = splitfileext(wfd.cFileName);
+
 			info.m_fullpath = String(path) + String(_T("\\")) + info.m_name;
+
+			transform(info.m_name.begin(), info.m_name.end(), info.m_name.begin(), toupper);
 
 			_TRACE( _T("file : %s\n"), info.m_name.c_str());
 			m_fileinfolist.push_back(info);
@@ -216,12 +244,14 @@ void	CDirectoryManager::DrawFile(Canvas *c)
 
 	CalcDisplayInfo();
 
+
 	//for (int i=m_displaytop ; i<m_displaylines; i++)
 	for (int i=0 ; i<m_displaylines; i++)
 	{
 		int pos = m_displaytop + i;
 		unsigned long color = m_finalresult[pos].m_type & TYPE_DIRECTORY ? 0xffff0000 : 0xffffffff;
-		c->Print(5, i * LINE_HEIGHT, m_finalresult[pos].m_fullpath.c_str(), color, false, 9);
+		//c->Print(5, i * LINE_HEIGHT, m_finalresult[pos].m_fullpath.c_str(), color, false, 9);
+		c->Print(5, i * LINE_HEIGHT, m_finalresult[pos].m_name.c_str(), color, false, 9, 370, 20);
 
 		if( m_selectedpos == pos )
 		{
