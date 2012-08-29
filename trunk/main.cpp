@@ -113,8 +113,10 @@ void	MojoShell::OnSize(wxSizeEvent& event)
 
  	if (m_backBuffer != NULL)
 	{
-		m_backBuffer->SetWidth(csize.x);
-		m_backBuffer->SetHeight(csize.y);
+// 		m_backBuffer->SetWidth(csize.x);
+// 		m_backBuffer->SetHeight(csize.y);
+		delete m_backBuffer;
+		m_backBuffer = new wxBitmap(csize.x, csize.y);
 	}
 	else
 	{

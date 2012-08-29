@@ -26,7 +26,7 @@ void	Canvas::Clear(unsigned long color)
 
 }
 
-void	Canvas::Print(int x, int y, const wchar_t * text, unsigned long color, bool rightalign, int fontsize)
+void	Canvas::Print(int x, int y, const wchar_t * text, unsigned long color, bool rightalign, int fontsize,int clipwidth, int clipheight)
 {
 	if (x > (rightalign == true ? m_Size[0] + 100 : m_Size[0]) || y > m_Size[1] || y + fontsize*2 < 0)
 		return ;
@@ -36,13 +36,21 @@ void	Canvas::Print(int x, int y, const wchar_t * text, unsigned long color, bool
 	{
 		m_Font[fontsize] = f = new wxFont(fontsize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 	}
-	m_DC->SetFont(*f);
 
+	m_DC->SetFont(*f);
 	m_DC->SetTextForeground(wxColor((color>>16)&0xFF, (color>>8)&0xFF, color&0xFF));
+
 	if (rightalign == false)
 	{
+		if( clipwidth != -1 && clipheight != -1 )
+		{
+			m_DC->SetClippingRegion(x,y,clipwidth, clipheight);
+		}
+
 		m_DC->DrawText(text, x, y);
 		//		m_DC->DrawText(text, x+1, y);
+
+		m_DC->DestroyClippingRegion();
 	}
 	else
 	{

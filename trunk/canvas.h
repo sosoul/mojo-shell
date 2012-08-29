@@ -11,7 +11,7 @@ public :
 
 	void	Clear(unsigned long color);
 	wxSize	GetTextSize(const wchar_t * text, int fontsize);
-	void	Print(int x, int y, const wchar_t * text, unsigned long color, bool rightalign, int fontsize);
+	void	Print(int x, int y, const wchar_t * text, unsigned long color, bool rightalign, int fontsize, int clipwidth = -1, int clipheight = -1);
 
 	void	DrawRect(int x, int y, int w, int h, unsigned long color, bool outline);
 	void	DrawLine(int x1, int y1, int x2, int y2, unsigned long color, int width);
