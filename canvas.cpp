@@ -2,6 +2,7 @@
 		Custom Canvas
 */
 
+
 #include "canvas.h"
 
 Canvas::Canvas(wxDC * dc, int w, int h)
